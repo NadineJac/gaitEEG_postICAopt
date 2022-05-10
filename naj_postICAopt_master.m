@@ -71,6 +71,3 @@ plot_Cz_ERSP_all_clean(PATH, cfg,...
 
 % cluster ERSP and GPM
 plot_cluster_ERSP(sii,PATH,cfg, {'clean_c', 'clean_d'});
-
-%% count ICs (delete later)
-test_countICs(sii,PATH, cfg)
