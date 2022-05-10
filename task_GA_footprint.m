@@ -47,37 +47,21 @@ for fi = fieldNames
         %% calculate feature
         GA_ERSP = mean(ERSP,4,'omitnan');
         
-        tmp = GA_ERSP; % only use positive values
-        tmp(tmp<0) = missing;
-        
         % skip feature A as no ERP after sPCA available!
         % B) correlation across frequencies --------------------------
-        dat = squeeze(mean(GA_ERSP,1));               % average over channels
-        Z = atanh(corr(dat','type', 'Pearson'));    % z transformed pearson correlation
-        triuZ = triu(Z,1);                          % only keep upper triangle of correlation matrix (w/o diagonal)
-        meanZ = sum(triuZ,'all')/sum(triuZ~=0, 'all');% average all nonzero elements
-        meanR = tanh(meanZ);                        % transform back to r
-        feature(1) = meanR.^2;                    % store squared mean correlation --> coefficient of Determination
+        feature(1) = B_Rfreq(GA_ERSP);
         
         % C) power ratio lateral/medial channels -------------------------
-        powLat = mean(tmp(cfg.lateralChanIdx, :,:), 'all', 'omitnan');
-        powMed = mean(tmp(setdiff(cfg.idx_EEG_chan, cfg.lateralChanIdx),:,:), 'all', 'omitnan');
-        feature(2) = powLat/powMed;
+        feature(2) = C_lateralPowRatio(GA_ERSP, cfg.lateralChanIdx);
         
         % D) power at neck electrodes contralateral to HS/ipsi --------------
-        powContra = sum(tmp(cfg.neckChanL,:,cfg.pntsRHS),'all','omitnan')+...
-            sum(tmp(cfg.neckChanR,:,cfg.pntsLHS),'all','omitnan');
-        powIpsi = sum(tmp(cfg.neckChanL,:,cfg.pntsLHS),'all','omitnan')+...
-            sum(tmp(cfg.neckChanR,:,cfg.pntsRHS),'all', 'omitnan');
-        feature(3) = powContra/powIpsi;
+        feature(3) = D_neckChanRatio(GA_ERSP,cfg.neckChanL, cfg.neckChanR, cfg.pntsLHS, cfg.pntsRHS);
         
         % E) power double support/single supp gait cycle power -------------
-        powD = sum(GA_ERSP(:,:,cfg.pntsDouble), 'all');
-        powS = sum(GA_ERSP, 'all')-powD;
-        feature(4) = powD/powS;
+        feature(4) = E_doubleSuppRatio(GA_ERSP, cfg.pntsDouble);
         
         % F) S/W power ratio --------------------------------------
-        feature(5) = mean(GA_ERSP, 'all');
+        feature(5) = F_swRatio(GA_ERSP);
         
         FOOTPRINT = table(feature(:,1),feature(:,2), feature(:,3), feature(:,4), feature(:,5),...
             'VariableNames', { 'B', 'C', 'D', 'E', 'F'},...
