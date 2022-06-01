@@ -55,11 +55,6 @@ task_gaitERSP_clean(cluster_sii, PATH, cfg, fieldName);% time-frequency decompos
 task_GA_gaitERSP_clean(cluster_sii, PATH, fieldName);% aggregate over subjects
 
 %% E remove eye ICs and spectral PCA
-% This script is based on work by Martin Seeber shared during an workshop,
-% we are currently awaiting his reply before sharing the respective script
-% online (May 2022). This unfortunatly means that this pipeline cannot be
-% run as is without producing errors from this point on
-% please call the respective functions without 'clean_e' string to compare the other pipelines
 task_clean_e(sii, PATH, cfg); % spectral cleaning (including time-frequency decomposition)
 task_GA_gaitERSP_clean(sii, PATH, 'clean_e');% aggregate over subjects
 
